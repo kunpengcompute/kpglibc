@@ -11,7 +11,7 @@
 安装以下编译所需的依赖组件：
 ~~~shell
 apt update
-apt install -y bison gawk build-essential gettext python3
+apt install bison gawk build-essential gettext python3
 ~~~
 
 ## 开源glibc代码下载
@@ -45,9 +45,33 @@ make -j$(nproc)
 ~~~
 
 ## 安全安装说明
-**重要提示：**如果要执行 make install，需指定安装路径，直接安装到系统默认路径可能导致系统崩溃。
+
+**重要提示**：如果要执行 make install，需指定安装路径，直接安装到系统默认路径可能导致系统崩溃。
 ~~~shell
 cd $GLIBC_SRC/build
 mkdir -p ../install
 make install DESTDIR=$GLIBC_SRC/install/
+~~~
+
+# 测试代码编译
+
+编译memcpy测试程序（使用调试符号以便perf分析）：
+~~~shell
+gcc -o test_memcpy test_memcpy.c -g -O2
+~~~
+
+## perf验证memcpy分支
+
+设置环境变量指向编译安装的glibc so库（请根据实际路径修改）：
+~~~shell
+export GLIBC_INSTALL=$GLIBC_SRC/install
+~~~
+
+使用perf工具验证memcpy分支调用情况，验证在鲲鹏950服务器上是否进入_memcpy_kunpeng950分支：
+
+~~~shell
+perf record -g -F 99 $GLIBC_INSTALL/lib64/ld-linux-aarch64.so.1 --library-path $GLIBC_INSTALL/lib64 ./test_memcpy
+
+# 生成报告
+perf report -g --stdio
 ~~~
