@@ -32,7 +32,8 @@ export GLIBC_SRC=/path/to/your/glibc
 ~~~shell
 cd $GLIBC_SRC
 wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/memcpy_kunpeng_glibc_2_31.patch
-git apply memcpy_kunpeng_glibc_2_31.patch
+git apply patch1_memcpy_kunpeng950_glibc_2_31.patch
+git apply patch2_memset_kunpeng950_glibc_2_31.patch
 ~~~
 
 ## 源码编译
