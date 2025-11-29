@@ -34,6 +34,7 @@ cd $GLIBC_SRC
 wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/memcpy_kunpeng_glibc_2_31.patch
 git apply patch1_memcpy_kunpeng950_glibc_2_31.patch
 git apply patch2_memset_kunpeng950_glibc_2_31.patch
+git apply patch3_memcmp_kunpeng950_glibc_2_31.patch
 ~~~
 
 ## 源码编译
@@ -56,22 +57,22 @@ make install DESTDIR=$GLIBC_SRC/install/
 
 # 测试代码编译
 
-编译memcpy测试程序（使用调试符号以便perf分析）：
+编译memcpy/memset/memcmp测试程序（使用调试符号以便perf分析）：
 ~~~shell
-gcc -o test_memcpy test_memcpy.c -g -O2
+gcc -o test_mem test_mem.c -g -O2
 ~~~
 
-## perf验证memcpy分支
+## perf验证分支
 
 设置环境变量指向编译安装的glibc so库（请根据实际路径修改）：
 ~~~shell
 export GLIBC_INSTALL=$GLIBC_SRC/install
 ~~~
 
-使用perf工具验证memcpy分支调用情况，验证在鲲鹏950服务器上是否进入_memcpy_kunpeng950分支：
+使用perf工具验证memcpy分支调用情况，验证在鲲鹏950服务器上是否进入相应的_kunpeng950分支：
 
 ~~~shell
-perf record -g -F 99 $GLIBC_INSTALL/lib64/ld-linux-aarch64.so.1 --library-path $GLIBC_INSTALL/lib64 ./test_memcpy
+perf record -g -F 99 $GLIBC_INSTALL/lib64/ld-linux-aarch64.so.1 --library-path $GLIBC_INSTALL/lib64 ./test_mem
 
 # 生成报告
 perf report -g --stdio
