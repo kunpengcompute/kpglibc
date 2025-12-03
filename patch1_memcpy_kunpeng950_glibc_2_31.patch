@@ -1,5 +1,5 @@
 diff --git a/sysdeps/aarch64/multiarch/Makefile b/sysdeps/aarch64/multiarch/Makefile
-index 8378107c78..1e4ea33298 100644
+index 8378107c78..156b23411e 100644
 --- a/sysdeps/aarch64/multiarch/Makefile
 +++ b/sysdeps/aarch64/multiarch/Makefile
 @@ -1,5 +1,5 @@
@@ -10,7 +10,7 @@ index 8378107c78..1e4ea33298 100644
  		   memset_generic memset_falkor memset_emag memset_kunpeng \
  		   memchr_generic memchr_nosimd \
 diff --git a/sysdeps/aarch64/multiarch/ifunc-impl-list.c b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
-index b7da62c3b0..0b4ae61928 100644
+index b7da62c3b0..99bc5d2b4a 100644
 --- a/sysdeps/aarch64/multiarch/ifunc-impl-list.c
 +++ b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
 @@ -41,6 +41,7 @@ __libc_ifunc_impl_list (const char *name, struct libc_ifunc_impl *array,
@@ -22,7 +22,7 @@ index b7da62c3b0..0b4ae61928 100644
  	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_generic))
    IFUNC_IMPL (i, name, memmove,
 diff --git a/sysdeps/aarch64/multiarch/memcpy.c b/sysdeps/aarch64/multiarch/memcpy.c
-index 2fafefd5d2..9b0779860d 100644
+index 2fafefd5d2..b967c46272 100644
 --- a/sysdeps/aarch64/multiarch/memcpy.c
 +++ b/sysdeps/aarch64/multiarch/memcpy.c
 @@ -32,9 +32,12 @@ extern __typeof (__redirect_memcpy) __memcpy_generic attribute_hidden;
@@ -41,7 +41,7 @@ index 2fafefd5d2..9b0779860d 100644
  		? __memcpy_falkor
 diff --git a/sysdeps/aarch64/multiarch/memcpy_kunpeng950.S b/sysdeps/aarch64/multiarch/memcpy_kunpeng950.S
 new file mode 100644
-index 0000000000..d264efe929
+index 0000000000..c9582c1463
 --- /dev/null
 +++ b/sysdeps/aarch64/multiarch/memcpy_kunpeng950.S
 @@ -0,0 +1,138 @@
@@ -68,124 +68,124 @@ index 0000000000..d264efe929
 +
 +#include <sysdep.h>
 +
-+#define dst_in      x0
-+#define src      x1
-+#define cnt      x2
-+#define dst  x3
-+#define src_end     x4
-+#define dst_end     x5
++#define dst_in	x0
++#define src		x1
++#define cnt		x2
++#define dst 	x3
++#define src_end	x4
++#define dst_end	x5
++#define vlen	x6
++#define tmp1	x7
 +
-+#define vlen x6
-+#define vlenx2      x7
-+#define cnt2 x8
-+#define tmp1 x9
-+
-+#define A_q  q0
-+#define B_q  q1
-+#define C_q  q2
-+#define D_q  q3
-+#define E_q  q4
-+#define F_q  q5
-+#define G_q  q6
-+#define H_q  q7
-+#define I_q  q16
-+#define J_q  q17
-+#define K_q  q18
-+#define L_q  q19
-+#define M_q  q20
-+#define N_q  q21
-+#define O_q  q22
-+#define P_q  q23
++#define A_q	q0
++#define B_q	q1
++#define C_q	q2
++#define D_q	q3
++#define E_q	q4
++#define F_q	q5
++#define G_q	q6
++#define H_q	q7
++#define I_q	q16
++#define J_q	q17
++#define K_q	q18
++#define L_q	q19
++#define M_q	q20
++#define N_q	q21
++#define O_q	q22
++#define P_q	q23
 +
 +.arch armv8.2-a+sve
 +
 +ENTRY (__memcpy_kunpeng950)
-+    cmp cnt, 192
-+      b.hi L(192_more)
-+    cntb vlen
++	cmp cnt, 192
++	b.hi L(192_more)
++	cntb vlen
 +
 +L(less_64):
-+      whilelo p0.b, xzr, cnt
-+      whilelo p1.b, vlen, cnt
-+      ld1b   z0.b, p0/z, [src, 0, mul vl]
-+      ld1b   z1.b, p1/z, [src, 1, mul vl]
-+      st1b   z0.b, p0, [dst_in, 0, mul vl]
-+      st1b   z1.b, p1, [dst_in, 1, mul vl]
-+      subs cnt,cnt,64
-+      b.hi L(64_more)
-+      ret
++	whilelo p0.b, xzr, cnt
++	whilelo p1.b, vlen, cnt
++	ld1b	z0.b, p0/z, [src, 0, mul vl]
++	ld1b	z1.b, p1/z, [src, 1, mul vl]
++	st1b	z0.b, p0, [dst_in, 0, mul vl]
++	st1b	z1.b, p1, [dst_in, 1, mul vl]
++	subs cnt, cnt, 64
++	b.hi L(64_more)
++	ret
 +
 +L(64_more):
-+      whilelo p2.b, xzr, cnt
-+      whilelo p3.b, vlen, cnt
-+      ld1b   z2.b, p2/z, [src, 2, mul vl]
-+      ld1b   z3.b, p3/z, [src, 3, mul vl]
-+      st1b   z2.b, p2, [dst_in, 2, mul vl]
-+      st1b   z3.b, p3, [dst_in, 3, mul vl]
-+      subs cnt,cnt,64
-+      b.hi L(128_more)
-+      ret
++	whilelo p2.b, xzr, cnt
++	whilelo p3.b, vlen, cnt
++	ld1b	z2.b, p2/z, [src, 2, mul vl]
++	ld1b	z3.b, p3/z, [src, 3, mul vl]
++	st1b	z2.b, p2, [dst_in, 2, mul vl]
++	st1b	z3.b, p3, [dst_in, 3, mul vl]
++	subs cnt, cnt, 64
++	b.hi L(128_more)
++	ret
++
 +L(128_more):
-+      whilelo p4.b, xzr, cnt
-+      whilelo p5.b, vlen, cnt
-+      ld1b   z4.b, p4/z, [src, 4, mul vl]
-+      ld1b   z5.b, p5/z, [src, 5, mul vl]
-+      st1b   z4.b, p4, [dst_in, 4, mul vl]
-+      st1b   z5.b, p5, [dst_in, 5, mul vl]
-+      ret
++	whilelo p4.b, xzr, cnt
++	whilelo p5.b, vlen, cnt
++	ld1b	z4.b, p4/z, [src, 4, mul vl]
++	ld1b	z5.b, p5/z, [src, 5, mul vl]
++	st1b	z4.b, p4, [dst_in, 4, mul vl]
++	st1b	z5.b, p5, [dst_in, 5, mul vl]
++	ret
 +
 +L(192_more):
-+    ldp      E_q, F_q, [src]
-+    ldp      G_q, H_q, [src, 32]
-+    add src_end, src, cnt
-+      add dst_end, dst_in, cnt
-+    mov dst, dst_in
-+    and      tmp1, src, 63
-+    cbz tmp1, L(already_align_64)
-+      bic    src, src, 63
-+      sub    dst, dst_in, tmp1
-+      add    cnt, cnt, tmp1
++	ldp	E_q, F_q, [src]
++	ldp	G_q, H_q, [src, 32]
++	add src_end, src, cnt
++	add dst_end, dst_in, cnt
++	mov dst, dst_in
++	and	tmp1, src, 63
++	cbz tmp1, L(already_align_64)
++	bic	src, src, 63
++	sub	dst, dst_in, tmp1
++	add	cnt, cnt, tmp1
 +L(already_align_64):
-+      ldp    A_q, B_q, [src, 64]
-+    ldp      C_q, D_q, [src, 96]
-+      stp    E_q, F_q, [dst_in]
-+    stp      G_q, H_q, [dst_in, 32]
-+      subs   cnt, cnt, 128+64
++	ldp	A_q, B_q, [src, 64]
++	ldp	C_q, D_q, [src, 96]
 +
-+    .p2align 4
++	ldp	I_q, J_q, [src_end, -128]
++	ldp	K_q, L_q, [src_end, -96]
++	ldp	M_q, N_q, [src_end, -64]
++	ldp	O_q, P_q, [src_end, -32]
++
++	stp	E_q, F_q, [dst_in]
++	stp	G_q, H_q, [dst_in, 32]
++	subs	cnt, cnt, 128+64+64
++	b.ls L(tail128_align_64)
++
++	.p2align 4
 +L(loop128_align_64):
-+    ldp      E_q, F_q, [src, 128]
-+    stp      A_q, B_q, [dst, 64]
-+    ldp      G_q, H_q, [src, 160]
-+      stp    C_q, D_q, [dst, 96]
-+      ldp    A_q, B_q, [src, 192]
-+    stp      E_q, F_q, [dst, 128]
-+      ldp    C_q, D_q, [src, 224]
-+    stp      G_q, H_q, [dst, 160]
++	ldp	E_q, F_q, [src, 128]
++	stp	A_q, B_q, [dst, 64]
++	ldp	G_q, H_q, [src, 160]
++	stp	C_q, D_q, [dst, 96]
++	ldp	A_q, B_q, [src, 192]
++	stp	E_q, F_q, [dst, 128]
++	ldp	C_q, D_q, [src, 224]
++	stp	G_q, H_q, [dst, 160]
 +
-+      add    src, src, 128
-+      add    dst, dst, 128
-+      subs   cnt, cnt, 128
-+      b.hs   L(loop128_align_64)
-+
-+    ldp      E_q, F_q, [src_end, -64]
-+      ldp    G_q, H_q, [src_end, -32]
-+    cmp cnt, #-64
-+    b.lo L(tail64_align_64)
++	add	src, src, 128
++	add	dst, dst, 128
++	subs	cnt, cnt, 128
++	b.hi	L(loop128_align_64)
 +
 +L(tail128_align_64):
-+      stp    A_q, B_q, [dst, 64]
-+      stp    C_q, D_q, [dst, 96]
++	stp	A_q, B_q, [dst, 64]
++	stp	C_q, D_q, [dst, 96]
 +
-+L(tail64_align_64):
-+      stp    E_q, F_q, [dst_end, -64]
-+      stp    G_q, H_q, [dst_end, -32]
-+      ret
-+
++	stp	I_q, J_q, [dst_end, -128]
++	stp	K_q, L_q, [dst_end, -96]
++	stp	M_q, N_q, [dst_end, -64]
++	stp	O_q, P_q, [dst_end, -32]
++	ret
 +END (__memcpy_kunpeng950)
 \ No newline at end of file
 diff --git a/sysdeps/unix/sysv/linux/aarch64/cpu-features.c b/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
-index 896c588fee..00fbf265de 100644
+index 896c588fee..d5df72f298 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
 +++ b/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
 @@ -39,6 +39,7 @@ static struct cpu_list cpu_list[] = {
@@ -197,7 +197,7 @@ index 896c588fee..00fbf265de 100644
  };
  
 diff --git a/sysdeps/unix/sysv/linux/aarch64/cpu-features.h b/sysdeps/unix/sysv/linux/aarch64/cpu-features.h
-index 1389cea1b3..1dd0f9beb1 100644
+index 1389cea1b3..2c5a1eb80f 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/cpu-features.h
 +++ b/sysdeps/unix/sysv/linux/aarch64/cpu-features.h
 @@ -60,6 +60,9 @@

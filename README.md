@@ -31,7 +31,9 @@ export GLIBC_SRC=/path/to/your/glibc
 在 glibc 源码目录中执行以下命令：
 ~~~shell
 cd $GLIBC_SRC
-wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/memcpy_kunpeng_glibc_2_31.patch
+wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/patch1_memcpy_kunpeng950_glibc_2_31.patch
+wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/patch2_memset_kunpeng950_glibc_2_31.patch
+wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/patch3_memcmp_kunpeng950_glibc_2_31.patch
 git apply patch1_memcpy_kunpeng950_glibc_2_31.patch
 git apply patch2_memset_kunpeng950_glibc_2_31.patch
 git apply patch3_memcmp_kunpeng950_glibc_2_31.patch
@@ -42,7 +44,7 @@ git apply patch3_memcmp_kunpeng950_glibc_2_31.patch
 ~~~shell
 cd $GLIBC_SRC
 mkdir build && cd build
-../configure --prefix=/usr
+../configure --prefix=/usr --disable-werror
 make -j$(nproc)
 ~~~
 
