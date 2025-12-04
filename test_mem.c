@@ -7,7 +7,7 @@
 #define DATA_SIZE (10 * 1024)
 #define MEMCPY_ITERATIONS (1000 * 10000)
 #define MEMSET_ITERATIONS (1000 * 10000)
-#define MEMCMP_ITERATIONS (100 * 1000 * 1000)
+#define MEMCMP_ITERATIONS (1000 * 1000)
 
 volatile int prevent_optimization = 0;
 
