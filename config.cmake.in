@@ -1,0 +1,66 @@
+# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cmake_minimum_required(VERSION 3.16.3)
+
+# ----------------------------------------------------------------------------
+# KPGLIBC cmake options
+# ----------------------------------------------------------------------------
+KPGLIBC_OPTION(BUILD_SHARED_LIBS            "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)"  ON)
+
+KPGLIBC_OPTION(OPTIMIZE            "HS OPTIMIZE"  TRUE)
+
+set(CMAKE_SKIP_RPATH TRUE)
+
+#---------------------------------------------------------------------
+# config build option
+#--------------------------------------------------------------------------
+set (CMAKE_BUILD_TYPE Release)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8.5" OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.5")
+    message("-- Insufficient g++ version:${CMAKE_CXX_COMPILER_VERSION}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto+fp+simd -mtune=cortex-a53 -fno-strict-aliasing -std=gnu11")
+else()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc")
+endif()
+endif()
+message("-- Building type: Release")
+
+set(KPGLIBC_CPU_LIMIT 1)
+if ("$ENV{KPGLIBC_CPU_CHECK_ENABLE}" STREQUAL "N")
+    set(KPGLIBC_CPU_LIMIT 0)
+endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DKPGLIBC_CPU_LIMIT=${KPGLIBC_CPU_LIMIT} -Wall -fopenmp -Wextra -D_FORTIFY_SOURCE=2 -O0 -fstack-protector-all -Wl,-z,relro,-z,now,-z,noexecstack -fPIC -s -fcommon -march=armv8-a+sve")
+set(CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_FLAGS " -DKPGLIBC_CPU_LIMIT=${KPGLIBC_CPU_LIMIT} -Wall -fopenmp -Wextra -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-all -Wl,-z,relro,-z,now,-z,noexecstack -fPIC -s -fcommon -march=armv8-a+sve ${CMAKE_CXX_FLAGS}")
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -Wall -fopenmp -Wextra -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-all -fPIC -fcommon -march=armv8-a+sve")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,relro,-z,now,-z,noexecstack -s")
+
+# 添加选项以启用覆盖率
+option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
+
+if(ENABLE_TEST_COVERAGE)
+    message(STATUS "Enabling test coverage options")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g")
+    set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -fprofile-arcs -ftest-coverage -g")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lgcov")
+endif()
+
+message("-- C_FLAGS: ${CMAKE_C_FLAGS}")
+message("-- CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message("-- CMAKE_ASM_FLAGS: ${CMAKE_ASM_FLAGS}")
+message("-- CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
