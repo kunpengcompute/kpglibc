@@ -13,5 +13,5 @@
 # limitations under the License.
 
 set(the_description "kpglibc")
-include_directories(${PROJECT_SOURCE_DIR}/src/core_sve/include)
-KPGLIBC_define_module_time(kpglibc_time)
+include_directories(${PROJECT_SOURCE_DIR}/src/basic/include)
+KPGLIBC_define_module(kpglibc_time)

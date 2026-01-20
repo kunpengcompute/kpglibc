@@ -460,19 +460,80 @@ macro(KPGLIBC_check_dependencies)
     endforeach()
 endmacro()
 
-# finds and sets headers and sources for the standard KPGLIBC module
-# Usage:
-# KPGLIBC_glob_module_sources(<extra sources&headers in the same format as used in KPGLIBC_set_module_sources>)
-macro(KPGLIBC_glob_module_sources)
+macro(KPGLIBC_sources_basic)
+  set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
+  set(CMAKE_ASM_CREATE_SHARED_LIBRARY
+    "${CMAKE_ASM_COMPILER} -shared -o <TARGET> <OBJECTS>"
+    )   
+  set(BASIC_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../basic/src")  
+  file(GLOB basic_src
+    "${BASIC_SRC_DIR}/cpufeature.c"
+    "${BASIC_SRC_DIR}/version.c"
+    )
+  set(BASIC_HDRS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../basic/include")  
+  file(GLOB basic_hdrs
+    "${BASIC_HDRS_DIR}/asmdefs.h"
+    "${BASIC_HDRS_DIR}/core_precomp.h"
+    )
+
   file(GLOB_RECURSE lib_srcs "src/*.c" "src/*.cpp")
   file(GLOB_RECURSE lib_asm "src/*.s" "src/*.S")
   file(GLOB_RECURSE lib_int_hdrs "src/*.hpp" "src/*.h")
   file(GLOB lib_hdrs "include/${name}/*.hpp" "include/${name}/*.h")
+endmacro()
 
-  source_group("Src" FILES ${lib_srcs} ${lib_asm} ${lib_int_hdrs})
-  source_group("Include" FILES ${lib_hdrs})
+macro(KPGLIBC_categorize_asm_sources)
+  set(asm_950 "")
+  set(asm_sve "")
+  set(asm_others "")
 
-  KPGLIBC_set_module_sources(${ARGN} HEADERS ${lib_hdrs} SOURCES ${lib_srcs} ${lib_asm} ${lib_int_hdrs})
+  # 3. Triple-split logic for Assembly files
+  foreach(asm_file ${lib_asm})
+    if(asm_file MATCHES "950\\.S$")
+      list(APPEND asm_950 ${asm_file})
+    elseif(asm_file MATCHES "sve\\.S$")
+      list(APPEND asm_sve ${asm_file})
+    else()
+      list(APPEND asm_others ${asm_file})
+    endif()
+  endforeach()
+endmacro()
+
+# finds and sets headers and sources for the standard KPGLIBC module
+# Usage:
+# KPGLIBC_glob_module_sources(<extra sources&headers in the same format as used in KPGLIBC_set_module_sources>)
+macro(KPGLIBC_glob_module_sources)
+  KPGLIBC_sources_basic()
+  source_group("Src" FILES ${lib_srcs} ${lib_asm} ${lib_int_hdrs} ${basic_src})
+  source_group("Include" FILES ${lib_hdrs} ${basic_hdrs})
+  KPGLIBC_set_module_sources(${ARGN} HEADERS ${lib_hdrs} ${basic_hdrs} SOURCES ${lib_srcs} ${lib_asm} ${lib_int_hdrs} ${basic_src})
+endmacro()
+
+macro(KPGLIBC_create_sve_module)
+  KPGLIBC_sources_basic()
+  KPGLIBC_categorize_asm_sources()
+  message(STATUS "[CHECK] asm_950 value: '${asm_950}'")
+  message(STATUS "[CHECK] asm_sve value: '${asm_sve}'")
+  message(STATUS "[CHECK] asm_others value: '${asm_others}'")
+
+  if(asm_950)
+    set(v_name_950 "${name}_950")
+    add_library(${v_name_950} SHARED ${asm_950} ${asm_others} ${lib_srcs} ${lib_int_hdrs} ${lib_hdrs} ${basic_hdrs} ${basic_src})
+    SET_TARGET_PROPERTIES(${v_name_950} PROPERTIES
+        VERSION   ${KPGLIBC_LIBVERSION}
+        )
+    message(STATUS "Created 950 variant: ${v_name_950} with version ${KPGLIBC_LIBVERSION}")
+  endif()
+
+  if(asm_sve)
+    set(v_name_sve "${name}")
+    add_library(${v_name_sve} SHARED ${asm_sve} ${asm_others} ${lib_srcs} ${lib_int_hdrs} ${lib_hdrs} ${basic_hdrs} ${basic_src})
+    set_target_properties(${v_name_sve} PROPERTIES 
+        OUTPUT_NAME "${v_name_sve}"
+        VERSION     "${KPGLIBC_LIBVERSION}"
+        )
+    message(STATUS "Created SVE variant: ${v_name_sve} with version ${KPGLIBC_LIBVERSION}")
+  endif()
 endmacro()
 
 # short command for adding simple KPGLIBC module
@@ -486,54 +547,7 @@ macro(KPGLIBC_define_module module_name)
   KPGLIBC_create_module()
 endmacro()
 
-macro(KPGLIBC_glob_module_sources_neon)
-  set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
-  set(CMAKE_ASM_CREATE_SHARED_LIBRARY
-    "${CMAKE_ASM_COMPILER} -shared -o <TARGET> <OBJECTS>"
-    )   
-  file(GLOB_RECURSE lib_srcs "src/*.c" "src/*.cpp")
-  file(GLOB_RECURSE lib_asm "src/*.s" "src/*.S")
-  file(GLOB_RECURSE lib_int_hdrs "src/*.hpp" "src/*.h")
-  set(CORE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../core_sve/src")  
-  file(GLOB core_src
-    "${CORE_SRC_DIR}/cpufeature.c"
-    "${CORE_SRC_DIR}/version.c"
-    )
-  file(GLOB lib_hdrs "include/${name}/*.hpp" "include/${name}/*.h")
-
-  source_group("Src" FILES ${lib_srcs} ${lib_asm} ${lib_int_hdrs} ${core_src})
-  source_group("Include" FILES ${lib_hdrs})
-
-  KPGLIBC_set_module_sources(${ARGN} HEADERS ${lib_hdrs} SOURCES ${lib_srcs} ${lib_asm} ${lib_int_hdrs} ${core_src})
-endmacro()
-
-macro(KPGLIBC_define_module_neon module_name)
+macro(KPGLIBC_define_sve_module module_name)
   KPGLIBC_add_module(${module_name} ${ARGN})
-  KPGLIBC_glob_module_sources_neon()
-  KPGLIBC_module_include_directories()
-  KPGLIBC_create_module()
-endmacro()
-
-macro(KPGLIBC_glob_module_sources_time)
-  file(GLOB_RECURSE lib_srcs "src/*.c" "src/*.cpp")
-  file(GLOB_RECURSE lib_asm "src/*.s" "src/*.S")
-  file(GLOB_RECURSE lib_int_hdrs "src/*.hpp" "src/*.h")
-  set(CORE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../core_sve/src")  
-  file(GLOB core_src
-    "${CORE_SRC_DIR}/cpufeature.c"
-    "${CORE_SRC_DIR}/version.c"
-    )
-  file(GLOB lib_hdrs "include/${name}/*.hpp" "include/${name}/*.h")
-
-  source_group("Src" FILES ${lib_srcs} ${lib_asm} ${lib_int_hdrs} ${core_src})
-  source_group("Include" FILES ${lib_hdrs})
-
-  KPGLIBC_set_module_sources(${ARGN} HEADERS ${lib_hdrs} SOURCES ${lib_srcs} ${lib_asm} ${lib_int_hdrs} ${core_src})
-endmacro()
-
-macro(KPGLIBC_define_module_time module_name)
-  KPGLIBC_add_module(${module_name} ${ARGN})
-  KPGLIBC_glob_module_sources_neon()
-  KPGLIBC_module_include_directories()
-  KPGLIBC_create_module()
+  KPGLIBC_create_sve_module()
 endmacro()

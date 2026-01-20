@@ -13,4 +13,5 @@
 # limitations under the License.
 
 set(the_description "kpglibc")
-KPGLIBC_define_module(kpglibc_sve)
+include_directories(${PROJECT_SOURCE_DIR}/src/basic/include)
+KPGLIBC_define_sve_module(kpglibc_sve)
