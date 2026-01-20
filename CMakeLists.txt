@@ -81,7 +81,3 @@ foreach(m ${KPGLIBC_MODULES_DISABLED_AUTO})
 endforeach()
 
 string(REPLACE "KPGLIBC_" "" KPGLIBC_MODULES_DISABLED_AUTO_ST  "${KPGLIBC_MODULES_DISABLED_AUTO_ST}")
-
-message("===================The modules build information as follwos:")
-message("    Public modules:         ${KPGLIBC_MODULES_PUBLIC}"        )
-message("    To be built:            ${KPGLIBC_MODULES_BUILD}"         )
