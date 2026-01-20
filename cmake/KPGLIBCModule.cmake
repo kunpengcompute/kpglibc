@@ -486,13 +486,26 @@ macro(KPGLIBC_categorize_asm_sources)
   set(asm_950 "")
   set(asm_sve "")
   set(asm_others "")
+  # 通用优化代码可添加在这里
+  set(ASM_BOTH_VARIANTS
+    memcmp-sve.S
+  )
+
 
   # 3. Triple-split logic for Assembly files
   foreach(asm_file ${lib_asm})
-    if(asm_file MATCHES "950\\.S$")
+    get_filename_component(fname ${asm_file} NAME)
+
+    if(fname IN_LIST ASM_BOTH_VARIANTS)
       list(APPEND asm_950 ${asm_file})
+      list(APPEND asm_sve ${asm_file})
+    
+    elseif(asm_file MATCHES "950\\.S$")
+      list(APPEND asm_950 ${asm_file})
+
     elseif(asm_file MATCHES "sve\\.S$")
       list(APPEND asm_sve ${asm_file})
+
     else()
       list(APPEND asm_others ${asm_file})
     endif()
