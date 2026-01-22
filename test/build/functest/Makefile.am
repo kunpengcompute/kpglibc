@@ -34,8 +34,8 @@ CFLAGS += -DLIB_GLIBC_NAME=\"libkpglibc.so\" -DLIB_GLIBC_TIME_NAME=\"libkpglibc_
 CXXFLAGS += -DLIB_GLIBC_NAME=\"libkpglibc.so\" -DLIB_GLIBC_TIME_NAME=\"libkpglibc_time.so\"
 else
 KPGLIBC_DIR += -I $(KPGLIBC_modules_DIR)/include/
-CFLAGS += -DLIB_GLIBC_NAME=\"libkpglibc_sve.so\" -DLIB_GLIBC_TIME_NAME=\"libkpglibc_time.so\"
-CXXFLAGS += -DLIB_GLIBC_NAME=\"libkpglibc_sve.so\" -DLIB_GLIBC_TIME_NAME=\"libkpglibc_time.so\"
+CFLAGS += -DLIB_GLIBC_NAME=\"libkpglibc_sve_950.so\" -DLIB_GLIBC_TIME_NAME=\"libkpglibc_time.so\"
+CXXFLAGS += -DLIB_GLIBC_NAME=\"libkpglibc_sve_950.so\" -DLIB_GLIBC_TIME_NAME=\"libkpglibc_time.so\"
 endif
 
 # Options for preprocessing stage, here are mainly header files.
