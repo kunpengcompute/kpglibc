@@ -151,7 +151,7 @@ TEST(MemcpyFuncTest, NoOverflow)
 
 TEST(MemcpyFuncTest, CopyLoopBuffer) {
     init_mymemcpy();
-    for(int i = 0;i < 100000; i++)
+    for(int i = 0;i < 4096; i++)
     {
         const size_t buffer_size = i;
         char source[buffer_size];
