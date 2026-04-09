@@ -62,7 +62,7 @@ kpglibc/
 
 已验证的硬件配置：鲲鹏架构下的openEuler系（例如openEuler 22.03 LTS）操作系统。
 
-- 编译说明
+编译。
 
 ```bash
 sh build.sh 
@@ -72,23 +72,23 @@ sh build.sh
 
 ## 快速上手
 
-1、PRELOAD覆盖加载使能
+1. PRELOAD覆盖加载使能。
 
 ```bash
 LD_PRELOAD=xxx/output/libkpglibc_sve.so <需要运行的程序> 
 ```
 
-2、编译链接使能
+2. 编译链接使能。
 
 ```bash
 gcc -o test_memcmp test_memcmp.c -Lxxx/output/ -lkpglibc_sve 
 ```
 
-已优化的函数列表请参见[API参考文档](docs/zh/api.md)
+已优化的函数列表请参见《[API参考](docs/zh/api.md)》。
 
 ## 安装后验证
 
-执行ll output命令查看so，回显如下结果说明编译成功
+执行ll output命令查看so，回显如下结果说明编译成功。
 
 ```text
 lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_neon.so -> libkpglibc_neon.so.1.0.3

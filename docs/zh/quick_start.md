@@ -8,7 +8,7 @@ kpglibc（Kunpeng GNU C Library）基于鲲鹏920/950系列处理器，利用向
 
 ## 安装
 
-编译安装请参见[安装指南](installation_guide.md)。
+编译安装请参见《[安装指南](./installation_guide.md)》。
 
 ## 使用方式
 
