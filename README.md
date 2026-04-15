@@ -28,7 +28,7 @@ export GLIBC_SRC=/path/to/your/glibc
 ~~~
 
 ## 应用kpglibc补丁
-在 glibc 源码目录中执行以下命令：
+在 glibc 源码目录中执行以下命令, patch需要按顺序应用：
 ~~~shell
 cd $GLIBC_SRC
 wget https://raw.gitcode.com/boostkit/kpglibc/raw/dev_for_BD_glibc2.31/patch1_memcpy_kunpeng950_glibc_2_31.patch

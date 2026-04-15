@@ -1,3 +1,16 @@
+From 5670fbb9a90add3ce8808e4cb4f84cfe3bf7bae7 Mon Sep 17 00:00:00 2001
+From: yeweihong <yeweihong@huawei.com>
+Date: Tue, 14 Apr 2026 17:45:39 +0800
+Subject: [PATCH] aarch64: Optimize memset for Kunpeng950
+
+---
+ sysdeps/aarch64/multiarch/Makefile            |   2 +-
+ sysdeps/aarch64/multiarch/ifunc-impl-list.c   |   1 +
+ sysdeps/aarch64/multiarch/memset.c            |   5 +-
+ sysdeps/aarch64/multiarch/memset_kunpeng950.S | 126 ++++++++++++++++++
+ 4 files changed, 132 insertions(+), 2 deletions(-)
+ create mode 100644 sysdeps/aarch64/multiarch/memset_kunpeng950.S
+
 diff --git a/sysdeps/aarch64/multiarch/Makefile b/sysdeps/aarch64/multiarch/Makefile
 index 156b23411e..fc95c0f62a 100644
 --- a/sysdeps/aarch64/multiarch/Makefile
@@ -43,14 +56,12 @@ index ad800bbb95..ecc317a053 100644
  	     ? __memset_falkor
 diff --git a/sysdeps/aarch64/multiarch/memset_kunpeng950.S b/sysdeps/aarch64/multiarch/memset_kunpeng950.S
 new file mode 100644
-index 0000000000..d36c6dcb90
+index 0000000000..c5bb727089
 --- /dev/null
 +++ b/sysdeps/aarch64/multiarch/memset_kunpeng950.S
-@@ -0,0 +1,128 @@
-+/*
-+   Copyright (C) 2012-2022 Free Software Foundation, Inc.
-+   Copyright (c) 2025 Huawei Technologies Co., Ltd.
-+   Optimized glibc function for Huawei Kunpeng processor.
+@@ -0,0 +1,126 @@
++/* Optimized memset for Huawei Kunpeng 950 processor.
++   Copyright (C) 2026 Free Software Foundation, Inc.
 +
 +   This file is part of the GNU C Library.
 +
@@ -175,3 +186,6 @@ index 0000000000..d36c6dcb90
 +	st1b    z0.b, p2, [dst_now, 1, mul vl]
 +    ret
 +END (__memset_kunpeng950)
+-- 
+2.33.0
+
