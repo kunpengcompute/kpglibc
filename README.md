@@ -2,113 +2,70 @@
 
 ## 最新消息
 
-- 2026-3-30 发布v1.0.3版本，新增针对950优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。
+- [2026-3-30]：发布v1.0.3版本，新增针对鲲鹏950处理器优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。
 
 ## 项目简介
 
-kpglibc是鲲鹏参与glibc开源社区的仓库，基于华为鲲鹏处理器利用向量化指令集对glibc中的字符串操作函数、内存操作函数和时间操作函数进行性能优化，适用于鲲鹏920新型号处理器、950处理器，推荐使用SVE优化的版本获得更好的性能。函数接口与开源glibc保持一致，接口内部不做完整入参校验，入参合法性及合理性由调用方业务来保证。
+kpglibc是鲲鹏参与glibc开源社区的仓库，基于华为鲲鹏处理器利用向量化指令集对glibc中的字符串操作函数、内存操作函数和时间操作函数进行性能优化，适用于鲲鹏920新型号处理器、鲲鹏950处理器，推荐使用SVE优化的版本获得更好的性能。函数接口与开源glibc保持一致，接口内部不做完整入参校验，入参合法性及合理性由调用方业务来保证。
 
 ## 目录结构
 
 ```text
 kpglibc/
-├── cmake/                    # CMake配置文件
-├── docs/                     # 项目文档
-│   ├── public_sys-resources/ # 文档资源文件
-│   ├── zh/                   # 中文文档
-│   └── LICENSE
-├── include/                  # 头文件
-├── src/                      # 源代码
-│   ├── basic/                # 基础代码
-│   │   ├── include/
-│   │   └── src/
-│   ├── core_neon/            # NEON优化实现
-│   │   ├── src/
-│   │   └── CMakeLists.txt
-│   ├── core_sve/             # SVE优化实现
-│   │   ├── src/
-│   │   └── CMakeLists.txt
-│   ├── time/                 # 时间函数优化实现
-│   │   ├── src/
-│   │   └── CMakeLists.txt
-│   └── CMakeLists.txt
-├── test/                     # 测试代码
-│   ├── build/
-│   ├── common/               # 测试用例代码 
-│   ├── gtest-download/
-│   ├── test_tool_bins/
-│   └── kp_coverage.py
-├── .gitignore
-├── CMakeLists.txt
-├── COPYING
-├── LICENSES
-├── README.md
-├── build.sh                  # 编译构建脚本
-├── config.cmake.in
-├── function.sh
-├── kpglibcver.h
-└── kpglibcver.h.in
+├── cmake/                          # CMake配置文件
+├── docs/                           # 项目文档
+│   ├── zh/                         # 中文文档
+│   │   ├── api_reference.md        # API参考文档
+│   │   ├── installation_guide.md   # 安装指南
+│   │   ├── quick_start.md          # 快速入门
+│   │   ├── release_notes.md        # 版本说明书
+│   └── LICENSE                     # 文档LICENSE文件
+├── include/                        # 对外接口头文件
+├── src/                            # 源代码
+│   ├── basic/                      # 公共基础代码
+│   ├── core_neon/                  # NEON优化实现
+│   ├── core_sve/                   # SVE优化实现
+│   ├── time/                       # 时间函数优化实现
+│   └── CMakeLists.txt              # Cmake文件
+├── test/                           # 测试代码
+│   ├── build/                      # 编译中间产物
+│   ├── common/                     # 测试用例代码 
+│   ├── gtest-download/             # gtest拉取脚本
+│   ├── test_tool_bins/             # 测试工具二进制
+│   └── kp_coverage.py              # 覆盖率统计脚本
+├── CMakeLists.txt                  # 项目Cmake文件
+├── LICENSES                        # 项目LICENSES文件
+├── README.md                       # 项目介绍文件
+├── build.sh                        # 编译构建脚本
+├── config.cmake.in                 # Cmake输入文件
+├── function.sh                     # 编译构建辅助脚本
+└── kpglibcver.h                    # kpglibc版本管理文件
 ```
 
 ## 版本说明
 
-| kpglibc | 开源glibc |  特性 |
+| kpglibc | 开源glibc | 特性 |
 | ------------ | ------------ | ------------ |
-|  v1.0.3 |  对标glibc 2.31，不局限于2.31版本，系统glibc为其他版本也可以使能 |新增针对950优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果|
-|  v1.0.2 |  对标glibc 2.34，不局限于2.34版本，系统glibc为其他版本也可以使能 |新增sve优化的memcpy、memset函数，在小批量的memcpy，memset有加速效果|
-|  v1.0.1 |  对标glibc 2.34，不局限于2.34版本，系统glibc为其他版本也可以使能 |针对鲲鹏处理器增加字符串操作函数、内存操作函数和时间操作函数性能优化|
+| v1.0.3 | 对标glibc 2.31，不局限于2.31版本，系统glibc为其他版本也可以使能 | 新增针对鲲鹏950处理器优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。 |
+| v1.0.2 | 对标glibc 2.34，不局限于2.34版本，系统glibc为其他版本也可以使能 | 新增SVE优化的memcpy、memset函数，在小批量的memcpy，memset有加速效果。 |
+| v1.0.1 | 对标glibc 2.34，不局限于2.34版本，系统glibc为其他版本也可以使能 | 针对鲲鹏处理器增加字符串操作函数、内存操作函数和时间操作函数性能优化。 |
 
 ## 环境部署
 
-已验证的硬件配置：鲲鹏架构下的openEuler系（例如openEuler 22.03 LTS）操作系统。
+kpglibc安装使能步骤请参见《[安装指南](docs/zh/installation_guide.md)》。
 
-编译。
+## 快速入门
 
-```bash
-sh build.sh 
-```
-
-编译产物在output文件夹下。
-
-## 快速上手
-
-1. PRELOAD覆盖加载使能。
-
-```bash
-LD_PRELOAD=xxx/output/libkpglibc_sve.so <需要运行的程序> 
-```
-
-2. 编译链接使能。
-
-```bash
-gcc -o test_memcmp test_memcmp.c -Lxxx/output/ -lkpglibc_sve 
-```
-
-已优化的函数列表请参见《[API参考](docs/zh/api.md)》。
-
-## 安装后验证
-
-执行ll output命令查看so，回显如下结果说明编译成功。
-
-```text
-lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_neon.so -> libkpglibc_neon.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_neon.so.1.0.3
-lrwxrwxrwx 1 root root    27 Mar  5 11:27 libkpglibc_sve_950.so -> libkpglibc_sve_950.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_sve_950.so.1.0.3
-lrwxrwxrwx 1 root root    23 Mar  5 11:27 libkpglibc_sve.so -> libkpglibc_sve.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_sve.so.1.0.3
-lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_time.so -> libkpglibc_time.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_time.so.1.0.3
-```
+安装kpglibc后请参见《[快速入门](docs/zh/quick_start.md)》验证kpglibc的加速能力。
 
 ## 学习文档
 
 | 资源名称 | 资源简介 |
 | --- | --- |
-| [快速入门](docs/zh/quick_start.md) | 提供kpglibc使能并验证加速能力的快速入门指导。 |
 | [版本说明书](docs/zh/release_notes.md) | 提供kpglibc每个发布版本的基础信息和特性更新信息。 |
 | [安装指南](docs/zh/installation_guide.md) | 提供kpglibc编译安装的详细指导。 |
-| [API参考](docs/zh/api.md) | 提供接口说明、接口调用示例等。 |
+| [快速入门](docs/zh/quick_start.md) | 提供kpglibc使能并验证加速能力的快速入门指导。 |
+| [API参考](docs/zh/api_reference.md) | 提供接口说明、接口调用示例等。 |
 
 ## 免责声明
 
