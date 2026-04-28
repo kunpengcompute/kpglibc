@@ -41,14 +41,14 @@
 
 **新增特性**
 
-新增针对950优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。
+新增针对鲲鹏950处理器优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。
 验证适配Debian 12系统。
 
 ### V1.0.2
 
 **修改特性**
 
-针对920新型号持续优化memcpy/memset函数，在小字节场景有加速效果。
+针对鲲鹏920新型号处理器持续优化memcpy/memset函数，在小字节场景有加速效果。
 
 ### V1.0.1
 
