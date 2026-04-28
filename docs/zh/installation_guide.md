@@ -35,11 +35,13 @@ openEuler操作系统[获取链接](https://www.openeuler.openatom.cn/zh/downloa
     ```bash
     cd kpglibc
     sh build.sh
-    ``` 
+    ```
+    
+    编译产物在`output`文件夹下。
 
 **编译后验证**
 
-执行**ll output**命令查看so，回显如下结果说明编译成功
+执行**ll output**命令查看so，回显如下结果说明编译成功。
 
 ```text
 lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_neon.so -> libkpglibc_neon.so.1.0.3

@@ -11,7 +11,7 @@
 </tr>
 <tr id="row24726251"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.2.1"><p id="p56669300">产品版本</p>
 </th>
-<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><span id="text152431189308">26.0.0</span></p>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><span id="text152431189308">26.0.RC1</span></p>
 </td>
 </tr>
 <tr id="row1930811171892"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.3.1"><p id="p2030912172097">软件名称</p>
@@ -41,14 +41,14 @@
 
 **新增特性**
 
-新增针对950优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。
+新增针对鲲鹏950处理器优化的memcpy/memmove/memcmp/memset函数，在大部分场景有加速效果。
 验证适配Debian 12系统。
 
 ### V1.0.2
 
 **修改特性**
 
-针对920新型号持续优化memcpy/memset函数，在小字节场景有加速效果。
+针对鲲鹏920新型号处理器持续优化memcpy/memset函数，在小字节场景有加速效果。
 
 ### V1.0.1
 
