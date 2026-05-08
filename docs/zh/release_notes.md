@@ -11,7 +11,7 @@
 </tr>
 <tr id="row24726251"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.2.1"><p id="p56669300">产品版本</p>
 </th>
-<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><span id="text152431189308">26.0.RC1</span></p>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><span id="text152431189308">26.1.RC1</span></p>
 </td>
 </tr>
 <tr id="row1930811171892"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.3.1"><p id="p2030912172097">软件名称</p>
@@ -21,7 +21,7 @@
 </tr>
 <tr id="row5497143514612"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.4.1"><p id="p162251517551">软件包版本</p>
 </th>
-<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.4.1 "><p id="p6225131165519">1.0.3</p>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.4.1 "><p id="p6225131165519">1.0.4</p>
 </td>
 </tr>
 </tbody>
@@ -36,6 +36,12 @@
 |Debian 12|鲲鹏950处理器|GCC 12.2.0|
 
 ## 版本更新说明
+
+### V1.0.4
+
+**修改特性**
+
+针对鲲鹏950处理器持续优化memcmp函数。
 
 ### V1.0.3
 

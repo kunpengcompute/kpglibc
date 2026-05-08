@@ -23,11 +23,11 @@
 #define src1    x0
 #define src2    x1
 #define cnt     x2
-#define left    x3
-#define off_vl      x4
-#define off_vlx2    x5
-#define off_vlx3    x6
-#define off_vlx4    x7
+#define result  w0
+#define off_vl      x3
+#define off_vlx2    x4
+#define off_vlx3    x5
+#define off_vlx4    x6
 
 ENTRY (memcmp)
     whilelo p0.b, xzr, cnt
@@ -62,11 +62,11 @@ ENTRY (memcmp)
     cmpne   p1.b, p0/z, z0.b, z1.b
     b.any   L(mismatch)
 
-    subs    left, cnt, off_vlx4
+    subs    cnt, cnt, off_vlx4
     b.ls    L(equal)
     add     src1, src1, off_vlx4
     add     src2, src2, off_vlx4
-    cmp     left, off_vlx4
+    cmp     cnt, off_vlx4
     b.lo    L(tail_4xvl)
 
     .p2align 4
@@ -93,33 +93,33 @@ L(loop_full):
 
     add     src1, src1, off_vlx4
     add     src2, src2, off_vlx4
-    subs    left, left, off_vlx4
-    cmp     left, off_vlx4
+    subs    cnt, cnt, off_vlx4
+    cmp     cnt, off_vlx4
     b.hs    L(loop_full)
 
 L(tail_4xvl):
-    whilelo p0.b, xzr, left
+    whilelo p0.b, xzr, cnt
     b.none  L(equal)
     ld1b    z0.b, p0/z, [src1]
     ld1b    z1.b, p0/z, [src2]
     cmpne   p1.b, p0/z, z0.b, z1.b
     b.any   L(mismatch)
 
-    whilelo p0.b, off_vl, left
+    whilelo p0.b, off_vl, cnt
     b.none  L(equal)
     ld1b    z0.b, p0/z, [src1, off_vl]
     ld1b    z1.b, p0/z, [src2, off_vl]
     cmpne   p1.b, p0/z, z0.b, z1.b
     b.any   L(mismatch)
 
-    whilelo p0.b, off_vlx2, left
+    whilelo p0.b, off_vlx2, cnt
     b.none  L(equal)
     ld1b    z0.b, p0/z, [src1, off_vlx2]
     ld1b    z1.b, p0/z, [src2, off_vlx2]
     cmpne   p1.b, p0/z, z0.b, z1.b
     b.any   L(mismatch)
 
-    whilelo p0.b, off_vlx3, left
+    whilelo p0.b, off_vlx3, cnt
     b.none  L(equal)
     ld1b    z0.b, p0/z, [src1, off_vlx3]
     ld1b    z1.b, p0/z, [src2, off_vlx3]
@@ -127,13 +127,12 @@ L(tail_4xvl):
     b.any   L(mismatch)
 
 L(equal):
-    mov x0, #0
+    mov     result, #0
     ret
 
 L(mismatch):
-    brkb    p2.b, p0/z, p1.b
-    lasta   w0, p2, z0.b
-    lasta   w1, p2, z1.b
-    sub     x0, x0, x1
+    mov     result, #1
+    cmphi   p2.b, p1/z, z1.b, z0.b
+    cneg    result, result, mi
     ret
 END (memcmp)
