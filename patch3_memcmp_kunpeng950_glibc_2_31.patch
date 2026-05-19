@@ -1,15 +1,16 @@
-From 139e4f1be9503d61c0036dd63a56be5742ff1a60 Mon Sep 17 00:00:00 2001
+From d925fe859bae3a9155be019af538183dbb648ae2 Mon Sep 17 00:00:00 2001
 From: yeweihong <yeweihong@huawei.com>
-Date: Mon, 20 Apr 2026 19:53:12 +0800
-Subject: [PATCH] aarch64: Optimize memcmp for Kunpeng950
+Date: Wed, 20 May 2026 11:30:26 +0800
+Subject: [PATCH] feat: optimize memcmp for kunpeng950
 
 ---
  sysdeps/aarch64/memcmp.S                      |  12 +-
  sysdeps/aarch64/multiarch/Makefile            |   1 +
+ sysdeps/aarch64/multiarch/ifunc-impl-list.c   |   3 +
  sysdeps/aarch64/multiarch/memcmp.c            |  41 +++++
  sysdeps/aarch64/multiarch/memcmp_generic.S    |  33 ++++
- sysdeps/aarch64/multiarch/memcmp_kunpeng950.S | 146 ++++++++++++++++++
- 5 files changed, 229 insertions(+), 4 deletions(-)
+ sysdeps/aarch64/multiarch/memcmp_kunpeng950.S | 145 ++++++++++++++++++
+ 6 files changed, 231 insertions(+), 4 deletions(-)
  create mode 100644 sysdeps/aarch64/multiarch/memcmp.c
  create mode 100644 sysdeps/aarch64/multiarch/memcmp_generic.S
  create mode 100644 sysdeps/aarch64/multiarch/memcmp_kunpeng950.S
@@ -54,6 +55,20 @@ index fc95c0f62a..64d227803c 100644
  		   memchr_generic memchr_nosimd \
  		   strlen_generic strlen_asimd
  endif
+diff --git a/sysdeps/aarch64/multiarch/ifunc-impl-list.c b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
+index fc95efe592..bd0fca7ba9 100644
+--- a/sysdeps/aarch64/multiarch/ifunc-impl-list.c
++++ b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
+@@ -38,6 +38,9 @@ __libc_ifunc_impl_list (const char *name, struct libc_ifunc_impl *array,
+   INIT_ARCH ();
+ 
+   /* Support sysdeps/aarch64/multiarch/memcpy.c and memmove.c.  */
++  IFUNC_IMPL (i, name, memcmp,
++	      IFUNC_IMPL_ADD (array, i, memcmp, sve, __memcmp_kunpeng950)
++	      IFUNC_IMPL_ADD (array, i, memcmp, 1, __memcmp_generic))
+   IFUNC_IMPL (i, name, memcpy,
+ 	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_thunderx)
+ 	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_thunderx2)
 diff --git a/sysdeps/aarch64/multiarch/memcmp.c b/sysdeps/aarch64/multiarch/memcmp.c
 new file mode 100644
 index 0000000000..fd69d8c694
@@ -142,10 +157,10 @@ index 0000000000..bf3c263c52
 +# include "../memcmp.S"
 diff --git a/sysdeps/aarch64/multiarch/memcmp_kunpeng950.S b/sysdeps/aarch64/multiarch/memcmp_kunpeng950.S
 new file mode 100644
-index 0000000000..c8482f1649
+index 0000000000..b5fb59ebcf
 --- /dev/null
 +++ b/sysdeps/aarch64/multiarch/memcmp_kunpeng950.S
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,145 @@
 +/* Optimized memcmp for Huawei Kunpeng 950 processor.
 +   Copyright (C) 2026 Free Software Foundation, Inc.
 +
@@ -178,11 +193,11 @@ index 0000000000..c8482f1649
 +#define src1    x0
 +#define src2    x1
 +#define cnt     x2
-+#define left    x3
-+#define off_vl      x4
-+#define off_vlx2    x5
-+#define off_vlx3    x6
-+#define off_vlx4    x7
++#define result  w0
++#define off_vl      x3
++#define off_vlx2    x4
++#define off_vlx3    x5
++#define off_vlx4    x6
 +
 +ENTRY (__memcmp_kunpeng950)
 +    whilelo p0.b, xzr, cnt
@@ -217,11 +232,11 @@ index 0000000000..c8482f1649
 +    cmpne   p1.b, p0/z, z0.b, z1.b
 +    b.any   L(mismatch)
 +
-+    subs    left, cnt, off_vlx4
++    subs    cnt, cnt, off_vlx4
 +    b.ls    L(equal)
 +    add     src1, src1, off_vlx4
 +    add     src2, src2, off_vlx4
-+    cmp     left, off_vlx4
++    cmp     cnt, off_vlx4
 +    b.lo    L(tail_4xvl)
 +
 +    .p2align 4
@@ -248,33 +263,33 @@ index 0000000000..c8482f1649
 +
 +    add     src1, src1, off_vlx4
 +    add     src2, src2, off_vlx4
-+    subs    left, left, off_vlx4
-+    cmp     left, off_vlx4
++    subs    cnt, cnt, off_vlx4
++    cmp     cnt, off_vlx4
 +    b.hs    L(loop_full)
 +
 +L(tail_4xvl):
-+    whilelo p0.b, xzr, left
++    whilelo p0.b, xzr, cnt
 +    b.none  L(equal)
 +    ld1b    z0.b, p0/z, [src1]
 +    ld1b    z1.b, p0/z, [src2]
 +    cmpne   p1.b, p0/z, z0.b, z1.b
 +    b.any   L(mismatch)
 +
-+    whilelo p0.b, off_vl, left
++    whilelo p0.b, off_vl, cnt
 +    b.none  L(equal)
 +    ld1b    z0.b, p0/z, [src1, off_vl]
 +    ld1b    z1.b, p0/z, [src2, off_vl]
 +    cmpne   p1.b, p0/z, z0.b, z1.b
 +    b.any   L(mismatch)
 +
-+    whilelo p0.b, off_vlx2, left
++    whilelo p0.b, off_vlx2, cnt
 +    b.none  L(equal)
 +    ld1b    z0.b, p0/z, [src1, off_vlx2]
 +    ld1b    z1.b, p0/z, [src2, off_vlx2]
 +    cmpne   p1.b, p0/z, z0.b, z1.b
 +    b.any   L(mismatch)
 +
-+    whilelo p0.b, off_vlx3, left
++    whilelo p0.b, off_vlx3, cnt
 +    b.none  L(equal)
 +    ld1b    z0.b, p0/z, [src1, off_vlx3]
 +    ld1b    z1.b, p0/z, [src2, off_vlx3]
@@ -282,16 +297,15 @@ index 0000000000..c8482f1649
 +    b.any   L(mismatch)
 +
 +L(equal):
-+    mov x0, #0
++    mov     result, #0
 +    ret
 +
 +L(mismatch):
-+    brkb    p2.b, p0/z, p1.b
-+    lasta   w0, p2, z0.b
-+    lasta   w1, p2, z1.b
-+    sub     x0, x0, x1
++    mov     result, #1
++    cmphi   p2.b, p1/z, z1.b, z0.b
++    cneg    result, result, mi
 +    ret
 +END (__memcmp_kunpeng950)
 -- 
-2.33.0
+2.27.0
 
