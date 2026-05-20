@@ -1,16 +1,17 @@
-From 3232606c6aee35b8639187fe0d5b49c037d88a70 Mon Sep 17 00:00:00 2001
+From 1c0f281826c38d07c4a5da6327e2b12240ffbae7 Mon Sep 17 00:00:00 2001
 From: yeweihong <yeweihong@huawei.com>
-Date: Tue, 14 Apr 2026 17:43:36 +0800
-Subject: [PATCH] aarch64: Optimize memcpy for Kunpeng950
+Date: Wed, 20 May 2026 11:19:08 +0800
+Subject: [PATCH] feat: optimize memcpy for kunpeng950
 
 ---
  sysdeps/aarch64/multiarch/Makefile            |   2 +-
  sysdeps/aarch64/multiarch/ifunc-impl-list.c   |   1 +
+ sysdeps/aarch64/multiarch/init-arch.h         |   4 +-
  sysdeps/aarch64/multiarch/memcpy.c            |   5 +-
  sysdeps/aarch64/multiarch/memcpy_kunpeng950.S | 115 ++++++++++++++++++
- .../unix/sysv/linux/aarch64/cpu-features.c    |   1 +
- .../unix/sysv/linux/aarch64/cpu-features.h    |   3 +
- 6 files changed, 125 insertions(+), 2 deletions(-)
+ .../unix/sysv/linux/aarch64/cpu-features.c    |   2 +
+ .../unix/sysv/linux/aarch64/cpu-features.h    |   5 +
+ 7 files changed, 131 insertions(+), 3 deletions(-)
  create mode 100644 sysdeps/aarch64/multiarch/memcpy_kunpeng950.S
 
 diff --git a/sysdeps/aarch64/multiarch/Makefile b/sysdeps/aarch64/multiarch/Makefile
@@ -25,17 +26,29 @@ index 8378107c78..156b23411e 100644
  		   memset_generic memset_falkor memset_emag memset_kunpeng \
  		   memchr_generic memchr_nosimd \
 diff --git a/sysdeps/aarch64/multiarch/ifunc-impl-list.c b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
-index b7da62c3b0..99bc5d2b4a 100644
+index b7da62c3b0..1ae9a1b344 100644
 --- a/sysdeps/aarch64/multiarch/ifunc-impl-list.c
 +++ b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
 @@ -41,6 +41,7 @@ __libc_ifunc_impl_list (const char *name, struct libc_ifunc_impl *array,
    IFUNC_IMPL (i, name, memcpy,
  	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_thunderx)
  	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_thunderx2)
-+        IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_kunpeng950)
++        IFUNC_IMPL_ADD (array, i, memcpy, sve, __memcpy_kunpeng950)
  	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_falkor)
  	      IFUNC_IMPL_ADD (array, i, memcpy, 1, __memcpy_generic))
    IFUNC_IMPL (i, name, memmove,
+diff --git a/sysdeps/aarch64/multiarch/init-arch.h b/sysdeps/aarch64/multiarch/init-arch.h
+index da47bc8677..21abacb9db 100644
+--- a/sysdeps/aarch64/multiarch/init-arch.h
++++ b/sysdeps/aarch64/multiarch/init-arch.h
+@@ -22,4 +22,6 @@
+   uint64_t __attribute__((unused)) midr =				      \
+     GLRO(dl_aarch64_cpu_features).midr_el1;				      \
+   unsigned __attribute__((unused)) zva_size =				      \
+-    GLRO(dl_aarch64_cpu_features).zva_size;
++    GLRO(dl_aarch64_cpu_features).zva_size;				        \
++  bool __attribute__((unused)) sve =					      \
++    GLRO(dl_aarch64_cpu_features).sve;
 diff --git a/sysdeps/aarch64/multiarch/memcpy.c b/sysdeps/aarch64/multiarch/memcpy.c
 index 2fafefd5d2..b967c46272 100644
 --- a/sysdeps/aarch64/multiarch/memcpy.c
@@ -176,7 +189,7 @@ index 0000000000..38a56303de
 +	ret
 +END (__memcpy_kunpeng950)
 diff --git a/sysdeps/unix/sysv/linux/aarch64/cpu-features.c b/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
-index 896c588fee..d5df72f298 100644
+index 896c588fee..ad81782be1 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
 +++ b/sysdeps/unix/sysv/linux/aarch64/cpu-features.c
 @@ -39,6 +39,7 @@ static struct cpu_list cpu_list[] = {
@@ -187,11 +200,27 @@ index 896c588fee..d5df72f298 100644
        {"generic", 	 0x0}
  };
  
+@@ -76,6 +77,7 @@ init_cpu_features (struct cpu_features *cpu_features)
+     }
+ 
+   cpu_features->midr_el1 = midr;
++  cpu_features->sve = GLRO (dl_hwcap) & HWCAP_SVE;
+ 
+   /* Check if ZVA is enabled.  */
+   unsigned dczid;
 diff --git a/sysdeps/unix/sysv/linux/aarch64/cpu-features.h b/sysdeps/unix/sysv/linux/aarch64/cpu-features.h
-index 1389cea1b3..2c5a1eb80f 100644
+index 1389cea1b3..a66408b499 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/cpu-features.h
 +++ b/sysdeps/unix/sysv/linux/aarch64/cpu-features.h
-@@ -60,6 +60,9 @@
+@@ -20,6 +20,7 @@
+ #define _CPU_FEATURES_AARCH64_H
+ 
+ #include <stdint.h>
++#include <stdbool.h>
+ 
+ #define MIDR_PARTNUM_SHIFT	4
+ #define MIDR_PARTNUM_MASK	(0xfff << MIDR_PARTNUM_SHIFT)
+@@ -60,10 +61,14 @@
  #define IS_KUNPENG920(midr) (MIDR_IMPLEMENTOR(midr) == 'H'			   \
                          && MIDR_PARTNUM(midr) == 0xd01)
  
@@ -201,6 +230,11 @@ index 1389cea1b3..2c5a1eb80f 100644
  struct cpu_features
  {
    uint64_t midr_el1;
+   unsigned zva_size;
++  bool sve;
+ };
+ 
+ #endif /* _CPU_FEATURES_AARCH64_H  */
 -- 
-2.33.0
+2.27.0
 

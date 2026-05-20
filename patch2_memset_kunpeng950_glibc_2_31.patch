@@ -1,7 +1,7 @@
-From 5670fbb9a90add3ce8808e4cb4f84cfe3bf7bae7 Mon Sep 17 00:00:00 2001
+From 21ac228620b325656278b56cec28702bff00403b Mon Sep 17 00:00:00 2001
 From: yeweihong <yeweihong@huawei.com>
-Date: Tue, 14 Apr 2026 17:45:39 +0800
-Subject: [PATCH] aarch64: Optimize memset for Kunpeng950
+Date: Wed, 20 May 2026 11:24:51 +0800
+Subject: [PATCH] feat: optimize memset for kunpeng950
 
 ---
  sysdeps/aarch64/multiarch/Makefile            |   2 +-
@@ -25,14 +25,14 @@ index 156b23411e..fc95c0f62a 100644
  		   strlen_generic strlen_asimd
  endif
 diff --git a/sysdeps/aarch64/multiarch/ifunc-impl-list.c b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
-index 99bc5d2b4a..4104f6b2ac 100644
+index 1ae9a1b344..fc95efe592 100644
 --- a/sysdeps/aarch64/multiarch/ifunc-impl-list.c
 +++ b/sysdeps/aarch64/multiarch/ifunc-impl-list.c
 @@ -55,6 +55,7 @@ __libc_ifunc_impl_list (const char *name, struct libc_ifunc_impl *array,
  	      IFUNC_IMPL_ADD (array, i, memset, (zva_size == 64), __memset_falkor)
  	      IFUNC_IMPL_ADD (array, i, memset, (zva_size == 64), __memset_emag)
  	      IFUNC_IMPL_ADD (array, i, memset, 1, __memset_kunpeng)
-+        IFUNC_IMPL_ADD (array, i, memset, 1, __memset_kunpeng950)
++        IFUNC_IMPL_ADD (array, i, memset, sve, __memset_kunpeng950)
  	      IFUNC_IMPL_ADD (array, i, memset, 1, __memset_generic))
    IFUNC_IMPL (i, name, memchr,
  	      IFUNC_IMPL_ADD (array, i, memchr, 1, __memchr_nosimd)
@@ -187,5 +187,5 @@ index 0000000000..c5bb727089
 +    ret
 +END (__memset_kunpeng950)
 -- 
-2.33.0
+2.27.0
 
