@@ -12,7 +12,7 @@ kpglibc（Kunpeng GNU C Library）基于鲲鹏920/950系列处理器，利用向
 
 ## 使用方式
 
-- 使用方式一：LD\_PRELOAD覆盖原glibc函数调用实现。
+- 使用方式一：LD\_PRELOAD覆盖原Glibc函数调用实现。
 
   ```bash
   LD_PRELOAD=/xxx/output/libkpglibc.so <需要运行的程序>
