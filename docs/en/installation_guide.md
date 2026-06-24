@@ -12,7 +12,7 @@ To use kpglibc smoothly and securely, ensure that your environment is one of the
 
 Download a required openEuler version from [Download Center](https://www.openeuler.openatom.cn/en/download/?archive=true).
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
 >
 >- kpglibc supports only Kunpeng series processors and will exit abnormally for any other processors. If a program dynamically loads kpglibc, the program exits when kpglibc is linked and an undefined result will be generated.
 >- The time function in kpglibc is available only in environments where the VVAR page size is 8 KB or 64 KB. In other environments, do not install **libkpglibc\_time.so**. You can run the **cat /proc/self/maps | grep vvar** command to query the VVAR page size.
@@ -35,11 +35,13 @@ This section describes how to install kpglibc by compiling the source code and v
     ```bash
     cd kpglibc
     sh build.sh
-    ``` 
+    ```
+    
+    The generated artifacts are located in the `output` directory.
 
 **Verification After Compilation**
 
-Run the **ll output** command to view the .so file. If the following information is displayed, the compilation is successful:
+Run the **ll output** command to view the .so files. If the following information is displayed, the compilation is successful:
 
 ```text
 lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_neon.so -> libkpglibc_neon.so.1.0.3

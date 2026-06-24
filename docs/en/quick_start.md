@@ -8,7 +8,7 @@ Application scenarios: string, memory, and time operations
 
 ## Installation
 
-For details about the compilation and installation, see [Installation Guide](installation_guide.md).
+For details about the compilation and installation, see [Installation Guide](./installation_guide.md).
 
 ## Usage
 
@@ -24,5 +24,6 @@ For details about the compilation and installation, see [Installation Guide](ins
     gcc -O3 -o test_memcmp test_memcmp.c -L/xxx/output -lkpglibc
     ```
 
-    >![](public_sys-resources/icon-note.gif) **NOTE:**
+    >![](public_sys-resources/icon-note.gif) **NOTE**
+    >
     >The **-O3** compilation option needs to be enabled during test code compilation. If the **gettimeofday** or **clock\_gettime** function is required, use **LD\_PRELOAD** to load **libkpglibc\_time.so**.

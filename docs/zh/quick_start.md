@@ -14,15 +14,15 @@ kpglibc（Kunpeng GNU C Library）基于鲲鹏920/950系列处理器，利用向
 
 - 使用方式一：LD\_PRELOAD覆盖原glibc函数调用实现。
 
-    ```bash
-    LD_PRELOAD=/xxx/output/libkpglibc.so <需要运行的程序>
-    ```
+  ```bash
+  LD_PRELOAD=/xxx/output/libkpglibc.so <需要运行的程序>
+  ```
 
 - 使用方式二：使用gcc命令编译时使用-L和-l链接上libkpglibc.so。
 
-    ```bash
-    gcc -O3 -o test_memcmp test_memcmp.c -L/xxx/output -lkpglibc
-    ```
+  ```bash
+  gcc -O3 -o test_memcmp test_memcmp.c -L/xxx/output -lkpglibc
+  ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >编译测试代码时需要使能O3编译选项。如果需要使用gettimeofday或clock\_gettime函数，请LD\_PRELOAD覆盖加载libkpglibc\_time.so。
+  >![](public_sys-resources/icon-note.gif) **说明：** 
+  >编译测试代码时需要启用O3编译选项。如果需要使用gettimeofday或clock\_gettime函数，请LD\_PRELOAD覆盖加载libkpglibc\_time.so。
