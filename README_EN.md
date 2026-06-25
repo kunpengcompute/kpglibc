@@ -82,13 +82,10 @@ The documents of this project are licensed under CC-BY 4.0. For details, see [LI
 ## Contributions
 
 If you have any questions or want to provide feedback on feature requirements and bug reports, you can submit issues. For details, see the contribution guideline.
-<!--[contribution guideline](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md).-->
 
 ## Suggestions and Feedback
 
 You are welcome to contribute to the community. If you have any questions or suggestions, submit issues. We will reply to you as soon as possible. Thank you for your support.
-<!--
-You are welcome to contribute to the community. If you have any questions or suggestions, submit [issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md). We will reply to you as soon as possible. Thank you for your support.-->
 
 ## Acknowledgments
 
