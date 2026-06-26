@@ -18,7 +18,8 @@
 |gettimeofday|Obtains the current system time, in seconds and microseconds.|
 |clock_gettime|Obtains the current system time, in seconds and nanoseconds.|
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >kpglibc is available only on the Kunpeng platform. The function interfaces do not verify all input parameters, and the parameter verification logic of the original glibc functions is used. The validity of input parameters needs to be ensured by the service that calls the interfaces.
 
 ## Function Description
@@ -47,7 +48,8 @@ char *strcpy(char *dest, const char *src);
 - Success: The start address of the destination character string is returned.
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-note.gif) **NOTE:**
+>![](public_sys-resources/icon-note.gif) **NOTE**
+>
 >Ensure that the destination buffer has sufficient space to contain the source character string (including **\\0** at the end). Otherwise, a memory overflow occurs.
 
 **Example**
@@ -102,7 +104,8 @@ int strcmp(const char *str1, const char *str2);
 
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >Characters are case sensitive. Therefore, the character strings "abc" and "ABC" are different.
 
 **Example**
@@ -164,7 +167,8 @@ void *memchr(const void *ptr, int value, size_t num);
 - Success: A pointer to the found character is returned.
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >Different from **strchr**, **memchr** scans **num** bytes (byte by byte) regardless of whether there is a null character. That is, this function searches for the position of **value** in the memory.
 
 **Example**
@@ -228,7 +232,8 @@ int memcmp(const void *ptr1, const void *ptr2, size_t num);
 
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >The comparison is performed byte by byte until a difference is found or all the **num** bytes are compared.
 
 **Example**
@@ -291,7 +296,8 @@ void *memcpy(void *dest, const void *src, size_t num);
 - Success: A pointer to the destination memory is returned.
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >If the source and destination memory blocks overlap, use **memmove** instead because **memcpy** cannot securely handle the overlapped memory.
 
 **Example**
@@ -343,7 +349,8 @@ void *memmove(void *dest, const void *src, size_t num);
 - Success: A pointer to the destination memory is returned.
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >Unlike **memcpy**, **memmove** allows the source and destination memory blocks to overlap, making it safer to use.
 
 **Example**
@@ -392,7 +399,8 @@ void *memset(void *ptr, int value, size_t num);
 - Success: A pointer to the destination memory is returned. The return value is generally ignored.
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >This function is used to initialize a memory block (by populating it with 0 or another value) or clear the block. As the ZVA instruction is used to optimize this operation, you should be aware of the system's ZVA block size.
 
 The **memset** memory clearing operation supports only a DC ZVA block size of 64 bytes. To verify the block size, see [ZVA Block Test](#ZVA_TEST).
@@ -477,7 +485,8 @@ int gettimeofday(struct timeval *tv, struct timezone *tz);
 - Success: **0** is returned.
 - Failure: See those of open source glibc. No other exception values will be returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >The precision of the time obtained using **gettimeofday** is microseconds.
 
 **Example**
@@ -536,7 +545,8 @@ int clock_gettime(clockid_t clk_id,struct timespec *tp);
 - Success: **0** is returned.
 - Failure: If **tp** is null, the **KPGLIBC\_STS\_PARAMETER\_ERR** error code is returned.
 
->![](public_sys-resources/icon-notice.gif) **NOTICE:**
+>![](public_sys-resources/icon-notice.gif) **NOTICE**
+>
 >The precision of the time obtained using **clock\_gettime** is nanoseconds.
 
 **Example**

@@ -2,7 +2,8 @@
 
 ## Latest Updates
 
-- 2026.03.30: Released the version v1.0.3, in which the memcpy, memmove, memcmp, and memset functions optimized for the Kunpeng 950 processor are added, providing acceleration in most scenarios.
+- [2026-06-30] Released the version v1.0.4, in which the memcmp function is further optimized for the Kunpeng 950 processor.
+- [2026-03-30] Released the version v1.0.3, in which the memcpy, memmove, memcmp, and memset functions optimized for the Kunpeng 950 processor are added, providing acceleration in most scenarios.
 
 ## Project Introduction
 
@@ -12,106 +13,61 @@ kpglibc is a repository contributed by Huawei Kunpeng to the glibc open-source c
 
 ```text
 kpglibc/
-├── cmake/                    # CMake configuration file
-├── docs/                     # Project documents
-│   ├── en/                   # English documentation
-│   │   ├── api_reference.md        # API Reference
-│   │   ├── installation_guide.md   # Installation Guide
-│   │   ├── quick_start.md          # Quick Start
-│   │   ├── release_notes.md        # Release Nodes
-│   └── LICENSE
-├── include/                  # Header file
-├── src/                      # Source code
-│   ├── basic/                # Basic code
-│   │   ├── include/
-│   │   └── src/
-│   ├── core_neon/            # NEON optimization implementation
-│   │   ├── src/
-│   │   └── CMakeLists.txt
-│   ├── core_sve/             # SVE optimization implementation
-│   │   ├── src/
-│   │   └── CMakeLists.txt
-│   ├── time/                 # Time function optimization implementation
-│   │   ├── src/
-│   │   └── CMakeLists.txt
-│   └── CMakeLists.txt
-├── test/                     # Test code
-│   ├── build/
-│   ├── common/               # Test case code
-│   ├── gtest-download/
-│   ├── test_tool_bins/
-│   └── kp_coverage.py
-├── .gitignore
-├── CMakeLists.txt
-├── COPYING
-├── LICENSES
-├── README.md
-├── build.sh                  # Build script
-├── config.cmake.in
-├── function.sh
-├── kpglibcver.h
-└── kpglibcver.h.in
+├── cmake/                          # CMake configuration file
+├── docs/                           # Project documents
+│   ├── en/                         # English documentation
+│   │   ├── api_reference.md        # API reference
+│   │   ├── installation_guide.md   # Installation guide
+│   │   ├── quick_start.md          # Quick start
+│   │   ├── release_notes.md        # Release notes
+│   └── LICENSE                     # Document license
+├── include/                        # Header file of external interfaces
+├── src/                            # Source code
+│   ├── basic/                      # Public basic code
+│   ├── core_neon/                  # NEON optimization implementation
+│   ├── core_sve/                   # SVE optimization implementation
+│   ├── time/                       # Time function optimization implementation
+│   └── CMakeLists.txt              # CMake file
+├── test/                           # Test code
+│   ├── build/                      # Intermediate build artifacts
+│   ├── common/                     # Test case code 
+│   ├── gtest-download/             # Script for fetching gtest
+│   ├── test_tool_bins/             # Test tool binaries
+│   └── kp_coverage.py              # Coverage statistics script
+├── CMakeLists.txt                  # Project CMake file
+├── LICENSES                        # Project license
+├── README_EN.md                    # Project introduction
+├── build.sh                        # Build script
+├── config.cmake.in                 # CMake input file
+├── function.sh                     # Build support script
+└── kpglibcver.h                    # kpglibc version control file
 ```
 
 ## Release Notes
 
-| kpglibc | Open-source glibc|  Feature|
+| kpglibc | Open-source glibc | Feature |
 | ------------ | ------------ | ------------ |
-|  v1.0.3 |  Aligned with glibc 2.31, but not limited to glibc 2.31. It can also be enabled for other glibc versions.|The memcpy, memmove, memcmp, and memset functions optimized for the Kunpeng 950 processor are added, providing acceleration in most scenarios.|
-|  v1.0.2 |  Aligned with glibc 2.34, but not limited to glibc 2.34. It can also be enabled for other glibc versions.|The memcpy and memset functions optimized with SVE are added, providing acceleration for small-batch memcpy and memset operations.|
-|  v1.0.1 |  Aligned with glibc 2.34, but not limited to glibc 2.34. It can also be enabled for other glibc versions.|Optimized the performance of the string, memory, and time operation functions for Kunpeng processors.|
+| v1.0.4 | Aligned with glibc 2.31, but not limited to glibc 2.31. It can also be enabled for other glibc versions. | The memcmp function is further optimized for the Kunpeng 950 processor. |
+| v1.0.3 | Aligned with glibc 2.31, but not limited to glibc 2.31. It can also be enabled for other glibc versions. | The memcpy, memmove, memcmp, and memset functions optimized for the Kunpeng 950 processor are added, providing acceleration in most scenarios. |
+| v1.0.2 | Aligned with glibc 2.34, but not limited to glibc 2.34. It can also be enabled for other glibc versions. | The memcpy and memset functions optimized with SVE are added, providing acceleration for small-batch memcpy and memset operations. |
+| v1.0.1 | Aligned with glibc 2.34, but not limited to glibc 2.34. It can also be enabled for other glibc versions. | Optimized the performance of the string, memory, and time operation functions for Kunpeng processors. |
 
 ## Environment Deployment
 
-Verified hardware configuration: openEuler OSs (for example, openEuler 22.03 LTS) running on the Kunpeng architecture.
-
-- Compilation
-
-```bash
-sh build.sh 
-```
-
-The compilation files are stored in the **output** folder.
+To install and enable kpglibc, refer to [Installation Guide](docs/en/installation_guide.md).
 
 ## Quick Start
 
-1. Enable PRELOAD.
-
-```bash
-LD_PRELOAD=xxx/output/libkpglibc_sve.so <program to be run>
-```
-
-2. Enable compilation and linking.
-
-```bash
-gcc -o test_memcmp test_memcmp.c -Lxxx/output/ -lkpglibc_sve 
-```
-
-For details about the list of optimized functions, see [API Reference](docs/en/api_reference.md).
-
-## Post-Installation Verification
-
-Run the **ll output** command to view the .so file. If the following information is displayed, the compilation is successful:
-
-```text
-lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_neon.so -> libkpglibc_neon.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_neon.so.1.0.3
-lrwxrwxrwx 1 root root    27 Mar  5 11:27 libkpglibc_sve_950.so -> libkpglibc_sve_950.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_sve_950.so.1.0.3
-lrwxrwxrwx 1 root root    23 Mar  5 11:27 libkpglibc_sve.so -> libkpglibc_sve.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_sve.so.1.0.3
-lrwxrwxrwx 1 root root    24 Mar  5 11:27 libkpglibc_time.so -> libkpglibc_time.so.1.0.3
--rwxr-xr-x 1 root root 67376 Mar  5 11:27 libkpglibc_time.so.1.0.3
-```
+After installing kpglibc, refer to [Quick Start](docs/en/quick_start.md) to verify kpglibc acceleration.
 
 ## Documents
 
-| Name| Description|
+| Name | Description |
 | --- | --- |
-| [Quick Start](docs/en/quick_start.md)| Provides guidance on how to quickly enable and verify the kpglibc feature.|
-| [Release Notes](docs/en/release_notes.md)| Provides basic information and feature updates of each kpglibc version.|
-| [Installation Guide](docs/en/installation_guide.md)| Describes how to compile and install kpglibc.|
-| [API Reference](docs/en/api_reference.md)| Provides API descriptions and API calling examples.|
+| [Release Notes](docs/en/release_notes.md) | Provides basic information and feature updates of each kpglibc version. |
+| [Installation Guide](docs/en/installation_guide.md) | Describes how to compile and install kpglibc. |
+| [Quick Start](docs/en/quick_start.md) | Provides guidance on how to quickly enable and verify the kpglibc feature. |
+| [API Reference](docs/en/api_reference.md)| Provides API descriptions and API calling examples. |
 
 ## Disclaimer
 
@@ -125,11 +81,11 @@ The documents of this project are licensed under CC-BY 4.0. For details, see [LI
 
 ## Contributions
 
-If you have any questions or want to provide feedback on feature requirements and bug reports, you can submit issues. For details, see the [contribution guideline](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md).
+If you have any questions or want to provide feedback on feature requirements and bug reports, you can submit issues. For details, see the contribution guideline.
 
 ## Suggestions and Feedback
 
-You are welcome to contribute to the community. If you have any questions or suggestions, submit [issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md). We will reply to you as soon as possible. Thank you for your support.
+You are welcome to contribute to the community. If you have any questions or suggestions, submit issues. We will reply to you as soon as possible. Thank you for your support.
 
 ## Acknowledgments
 
